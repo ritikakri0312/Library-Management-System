@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import Sidebar from "../components/Sidebar";
 import Navbar from "../components/Navbar";
 import axios from "axios";
+import "./ReturnBook.css"; // ← Add this for styling
 
 export default function ReturnBook() {
   const [issuedBooks, setIssuedBooks] = useState([]);
@@ -14,17 +15,15 @@ export default function ReturnBook() {
   }, []);
 
   const loadIssuedBooks = async () => {
-  try {
-    const res = await axios.get("http://localhost:5000/api/issued-books");
+    try {
+      const res = await axios.get("http://localhost:5000/api/issued-books");
 
-    console.log("API Response:", res.data);  // ← ADD THIS
-   setIssuedBooks(res.data.filter(b => b.status.toLowerCase() === "issued"));
-
-  } catch (err) {
-    console.log(err);
-  }
-};
-
+      // Only show books with status = Issued
+      setIssuedBooks(res.data.filter(b => b.status.toLowerCase() === "issued"));
+    } catch (err) {
+      console.log(err);
+    }
+  };
 
   const handleReturnBook = async (e) => {
     e.preventDefault();
@@ -42,13 +41,9 @@ export default function ReturnBook() {
 
       alert("Book Returned Successfully!");
 
-      // reset fields
       setSelectedIssue("");
       setReturnDate("");
-
-      // reload table
-      loadIssuedBooks();
-
+      loadIssuedBooks(); // refresh list
     } catch (err) {
       console.log(err);
       alert("Error returning book");
@@ -62,38 +57,45 @@ export default function ReturnBook() {
       <div className="content">
         <Navbar />
 
-        <div className="page">
-          <h1>Return Book</h1>
+        <div className="return-book-container">
+          <h2 className="page-title">📘 Return Book</h2>
 
-          <form className="form" onSubmit={handleReturnBook}>
-            <label>Select Issued Book</label>
-            <select
-              value={selectedIssue}
-              onChange={(e) => setSelectedIssue(e.target.value)}
-            >
-              <option value="">Select...</option>
+          <div className="return-card">
+            <form className="return-form" onSubmit={handleReturnBook}>
 
-              {issuedBooks.map((book) => (
-                <option key={book._id} value={book._id}>
-                  {book.studentName} - {book.bookTitle}
-                </option>
-              ))}
-            </select>
+              <label className="form-label">Select Issued Book</label>
+              <select
+                value={selectedIssue}
+                onChange={(e) => setSelectedIssue(e.target.value)}
+                className="form-select"
+              >
+                <option value="">Select...</option>
 
-            <label>Return Date</label>
-            <input
-              type="date"
-              value={returnDate}
-              onChange={(e) => setReturnDate(e.target.value)}
-            />
+                {issuedBooks.map((book) => (
+                  <option key={book._id} value={book._id}>
+                    {book.studentName} — {book.bookTitle}
+                  </option>
+                ))}
+              </select>
 
-            <button className="btn-edit" style={{ marginTop: "15px" }}>
-              Return Book
-            </button>
-          </form>
+              <label className="form-label">Return Date</label>
+              <input
+                type="date"
+                value={returnDate}
+                onChange={(e) => setReturnDate(e.target.value)}
+                className="form-input"
+              />
 
+              <button className="submit-btn">
+                Return Book
+              </button>
+
+            </form>
+          </div>
         </div>
+
       </div>
     </div>
   );
 }
+

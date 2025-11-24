@@ -1,0 +1,54 @@
+.navbar {
+  width: 100%;
+  height: 60px;
+  background: #000814;
+  display: flex;
+  align-items: center;
+  padding: 0 25px;
+  border-bottom: 1px solid #1e293b;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+
+  position: sticky;
+  top: 0;
+  z-index: 100;
+}
+
+/* Title Styling */
+.navbar-title {
+  color: #ffffff;
+  font-size: 22px;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+
+  animation: fadeIn 0.8s ease;
+}
+
+.navbar-title span {
+  letter-spacing: 1px;
+}
+
+/* Hover Glow Effect */
+.navbar-title:hover {
+  color: #60a5fa;
+  cursor: default;
+  transition: 0.3s;
+}
+
+/* Icon pop effect */
+.navbar-title:hover span {
+  letter-spacing: 2px;
+}
+
+/* Fade Animation */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0px);
+  }
+}

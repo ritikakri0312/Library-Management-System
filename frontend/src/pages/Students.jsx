@@ -10,13 +10,22 @@ export default function Students() {
     rollNo: "",
     name: "",
     email: "",
-    course: ""
+    course: "",
+    password: "" // Required for login
   });
 
-  // Fetch Students
+  // ==============================
+  // FETCH STUDENTS (Admin Token)
+  // ==============================
   const fetchStudents = async () => {
     try {
-      const res = await axios.get("http://localhost:5000/api/students");
+      const token = localStorage.getItem("token");
+
+
+      const res = await axios.get("http://localhost:5000/api/students", {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+
       setStudents(res.data);
     } catch (err) {
       console.error("Error fetching students", err);
@@ -27,33 +36,62 @@ export default function Students() {
     fetchStudents();
   }, []);
 
-  // Handle Input Change
+  // ==============================
+  // INPUT HANDLING
+  // ==============================
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
-  // Add Student
+  // ==============================
+  // ADD STUDENT (IMPORTANT FIX)
+  // ==============================
   const addStudent = async () => {
-    try {
-      await axios.post("http://localhost:5000/api/students", formData);
+  try {
+    const token = localStorage.getItem("token");
 
-      alert("Student Added Successfully!");
-      setShowForm(false);
-      setFormData({ rollNo: "", name: "", email: "", course: "" });
 
-      fetchStudents();
-    } catch (err) {
-      console.error("Error adding student", err);
-    }
-  };
+    await axios.post(
+      "http://localhost:5000/api/students",  // ✔ CORRECT ENDPOINT
+      formData,
+      {
+        headers: { Authorization: `Bearer ${token}` }
+      }
+    );
 
-  // Delete Student
+    alert("Student Added Successfully!");
+
+    setShowForm(false);
+    setFormData({
+      rollNo: "",
+      name: "",
+      email: "",
+      course: "",
+      password: ""
+    });
+
+    fetchStudents();
+  } catch (err) {
+    console.error("Error adding student", err);
+    alert("Error adding student");
+  }
+};
+
+  // ==============================
+  // DELETE STUDENT
+  // ==============================
   const deleteStudent = async (id) => {
     if (!window.confirm("Delete this student?")) return;
 
     try {
-      await axios.delete(`http://localhost:5000/api/students/${id}`);
-      fetchStudents(); // refresh list
+      const token = localStorage.getItem("token");
+
+
+      await axios.delete(`http://localhost:5000/api/students/${id}`, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+
+      fetchStudents();
     } catch (err) {
       console.error("Error deleting student", err);
     }
@@ -67,8 +105,6 @@ export default function Students() {
         <Navbar />
 
         <div className="page">
-
-          {/* HEADER */}
           <div className="header-row">
             <h1>Students</h1>
             <button className="btn-add" onClick={() => setShowForm(true)}>
@@ -76,7 +112,6 @@ export default function Students() {
             </button>
           </div>
 
-          {/* POPUP FORM */}
           {showForm && (
             <div className="popup">
               <div className="popup-inner">
@@ -114,6 +149,14 @@ export default function Students() {
                   onChange={handleChange}
                 />
 
+                <input
+                  type="password"
+                  name="password"
+                  placeholder="Password"
+                  value={formData.password}
+                  onChange={handleChange}
+                />
+
                 <button className="btn-save" onClick={addStudent}>
                   Save
                 </button>
@@ -128,7 +171,6 @@ export default function Students() {
             </div>
           )}
 
-          {/* STUDENTS TABLE */}
           <table className="styled-table">
             <thead>
               <tr>
@@ -150,9 +192,8 @@ export default function Students() {
                     <td>{s.course}</td>
 
                     <td className="action-buttons">
-                      <button className="btn-edit">
-                        Edit
-                      </button>
+                      <button className="btn-edit">Edit</button>
+
                       <button
                         className="btn-delete"
                         onClick={() => deleteStudent(s._id)}
@@ -171,7 +212,6 @@ export default function Students() {
               )}
             </tbody>
           </table>
-
         </div>
       </div>
     </div>

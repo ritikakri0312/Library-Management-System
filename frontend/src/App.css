@@ -552,3 +552,11 @@ button {
 .issue-btn:hover {
   background: #2563eb;
 }
+
+html, body {
+  height: auto !important;
+  overflow-y: auto !important;
+  margin: 0;
+  padding: 0;
+}
+

@@ -11,40 +11,44 @@ export default function IssueBook() {
   const [selectedBook, setSelectedBook] = useState("");
   const [issueDate, setIssueDate] = useState("");
 
-  // Fetch students + books
   useEffect(() => {
-    axios.get("http://localhost:5000/api/students").then((res) => setStudents(res.data));
-    axios.get("http://localhost:5000/api/books").then((res) => setBooks(res.data));
+    const token = localStorage.getItem("token");
+
+    axios.get("http://localhost:5000/api/students", {
+      headers: { Authorization: `Bearer ${token}` }
+    }).then((res) => setStudents(res.data.students || res.data));
+
+    axios.get("http://localhost:5000/api/books", {
+      headers: { Authorization: `Bearer ${token}` }
+    }).then((res) => setBooks(res.data.books || res.data));
   }, []);
+// Handle Submit
+const handleIssueBook = async () => {
+  if (!selectedStudent || !selectedBook || !issueDate) {
+    alert("Please fill all fields!");
+    return;
+  }
 
-  // Handle Submit
-  const handleIssueBook = async () => {
-    if (!selectedStudent || !selectedBook || !issueDate) {
-      alert("Please fill all fields!");
-      return;
-    }
+  try {
+    await axios.post("http://localhost:5000/api/issued-books/issue-by-id", {
+      studentId: selectedStudent,
+      bookId: selectedBook,
+      issueDate
+    });
 
-    try {
-      // ✅ FIX IS HERE - correct backend route
-      const res = await axios.post("http://localhost:5000/api/issued-books/issue-by-id", {
-        studentId: selectedStudent,
-        bookId: selectedBook,
-        issueDate
-      });
+    alert("Book Issued Successfully!");
 
-      alert("Book Issued Successfully!");
-      console.log(res.data);
+    // Clear form
+    setSelectedStudent("");
+    setSelectedBook("");
+    setIssueDate("");
 
-      // Clear form
-      setSelectedStudent("");
-      setSelectedBook("");
-      setIssueDate("");
+  } catch (error) {
+    alert("Error issuing book");
+    console.error(error);
+  }
+};
 
-    } catch (error) {
-      alert("Error issuing book");
-      console.error(error);
-    }
-  };
 
   return (
     <div className="layout">
@@ -56,7 +60,6 @@ export default function IssueBook() {
           <h2>Issue a Book</h2>
 
           <div className="issue-card">
-
             <label>Select Student</label>
             <select value={selectedStudent} onChange={(e) => setSelectedStudent(e.target.value)}>
               <option value="">Select Student</option>
@@ -83,7 +86,6 @@ export default function IssueBook() {
             <button className="issue-btn" onClick={handleIssueBook}>
               Issue Book
             </button>
-
           </div>
         </div>
       </div>

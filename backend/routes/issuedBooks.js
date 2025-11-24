@@ -17,6 +17,38 @@ router.get("/", async (req, res) => {
   }
 });
 
+// DELETE ISSUED BOOK BY ID
+// router.delete("/issued-books/:id", async (req, res) => {
+//   try {
+//     const deleted = await IssuedBook.findByIdAndDelete(req.params.id);
+
+//     if (!deleted) {
+//       return res.status(404).json({ message: "Issued book record not found" });
+//     }
+
+//     res.json({ message: "Issued book deleted successfully" });
+//   } catch (err) {
+//     console.log(err);
+//     res.status(500).json({ message: "Server error while deleting record" });
+//   }
+// });
+
+// DELETE ISSUED BOOK BY ID
+router.delete("/:id", async (req, res) => {
+  try {
+    const deleted = await IssuedBook.findByIdAndDelete(req.params.id);
+
+    if (!deleted) {
+      return res.status(404).json({ message: "Record not found" });
+    }
+
+    res.json({ message: "Issued book deleted successfully" });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+
 // -------------------------------------------------------
 // ISSUE BOOK (USING studentId + bookId)
 // -------------------------------------------------------
